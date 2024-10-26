@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MWI - Save Inventory
 // @namespace    http://tampermonkey.net/
-// @version      0.0.3
+// @version      0.0.4
 // @description  Get MWI Inventory and save as JSON
 // @author       JaanJah
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=milkywayidle.com
@@ -24,7 +24,10 @@
   // WebSocket hook logic taken from MooneyCalc Importer
   // @link https://greasyfork.org/en/scripts/494468-mooneycalc-importer
   function hookWS() {
-    const dataProperty = Object.getOwnPropertyDescriptor(MessageEvent.prototype, "data");
+    const dataProperty = Object.getOwnPropertyDescriptor(
+      MessageEvent.prototype,
+      "data",
+    );
     const oriGet = dataProperty.get;
 
     dataProperty.get = hookedGet;
@@ -35,8 +38,10 @@
       if (!(socket instanceof WebSocket)) {
         return oriGet.call(this);
       }
-      if (socket.url.indexOf("api.milkywayidle.com/ws") <= -1
-        && socket.url.indexOf("api-test.milkywayidle.com/ws") <= -1) {
+      if (
+        socket.url.indexOf("api.milkywayidle.com/ws") <= -1 &&
+        socket.url.indexOf("api-test.milkywayidle.com/ws") <= -1
+      ) {
         return oriGet.call(this);
       }
 
@@ -59,35 +64,42 @@
     return message;
   }
 
-  function waitForElement(selector, callback, intervalTime = 500, timeout = 10000) {
-      const startTime = Date.now();
+  function waitForElement(
+    selector,
+    callback,
+    intervalTime = 500,
+    timeout = 10000,
+  ) {
+    const startTime = Date.now();
 
-      const interval = setInterval(() => {
-          const element = document.querySelector(selector);
-          if (element) {
-              clearInterval(interval);
-              callback(element);
-          } else if (Date.now() - startTime > timeout) {
-              clearInterval(interval);
-              console.warn(`Element ${selector} not found within ${timeout}ms`);
-          }
-      }, intervalTime);
+    const interval = setInterval(() => {
+      const element = document.querySelector(selector);
+      if (element) {
+        clearInterval(interval);
+        callback(element);
+      } else if (Date.now() - startTime > timeout) {
+        clearInterval(interval);
+        console.warn(`Element ${selector} not found within ${timeout}ms`);
+      }
+    }, intervalTime);
   }
 
   function createCopyButton(parent) {
     const childClass = "NavigationBar_minorNavigationLink__31K7Y";
-    const copyButton = document.createElement("div")
-    copyButton.classList.add(childClass)
-    copyButton.innerHTML = "Copy Inventory to Clipboard"
-    parent.appendChild(copyButton)
+    const copyButton = document.createElement("div");
+    copyButton.classList.add(childClass);
+    copyButton.innerHTML = "Copy Inventory to Clipboard";
+    parent.appendChild(copyButton);
     return copyButton;
   }
 
   function copyToClipboard(copyButton) {
-    navigator.clipboard.writeText(JSON.stringify({
-      // client_data,
-      ...getCharacterData(character_data)
-    }));
+    navigator.clipboard.writeText(
+      JSON.stringify({
+        // client_data,
+        ...getCharacterData(character_data),
+      }),
+    );
     const originalText = copyButton.innerHTML;
     copyButton.innerHTML = "Copied!";
     setTimeout(() => {
@@ -101,9 +113,8 @@
       skills: character_data.characterSkills,
       abilities: character_data.characterAbilities,
       items: character_data.characterItems,
-      houses: character_data.characterHouseRoomMap,
       house_buffs: character_data.houseActionTypeBuffsMap,
       equipment_buffs: character_data.equipmentActionTypeBuffsMap,
-    }
+    };
   }
 })();
