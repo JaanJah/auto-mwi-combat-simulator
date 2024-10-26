@@ -10,6 +10,86 @@
 // @grant        none
 // ==/UserScript==
 
-(function() {
-    'use strict';
+(function () {
+  "use strict";
+
+  hookWS();
+  waitForElement(".NavigationBar_minorNavigationLinks__dbxh7", (element) => {
+    let copyButton = createCopyButton(element);
+    copyButton.addEventListener("click", () => {
+      navigator.clipboard.writeText(JSON.stringify({
+        // client_data,
+        character_data
+      }));
+      const originalText = copyButton.innerHTML;
+      copyButton.innerHTML = "Copied!";
+      setTimeout(() => {
+        copyButton.innerHTML = originalText;
+      }, 500);
+    });
+  });
+  let client_data = {};
+  let character_data = {};
+
+  // WebSocket hook logic taken from MooneyCalc Importer
+  // @link https://greasyfork.org/en/scripts/494468-mooneycalc-importer
+  function hookWS() {
+    const dataProperty = Object.getOwnPropertyDescriptor(MessageEvent.prototype, "data");
+    const oriGet = dataProperty.get;
+
+    dataProperty.get = hookedGet;
+    Object.defineProperty(MessageEvent.prototype, "data", dataProperty);
+
+    function hookedGet() {
+      const socket = this.currentTarget;
+      if (!(socket instanceof WebSocket)) {
+        return oriGet.call(this);
+      }
+      if (socket.url.indexOf("api.milkywayidle.com/ws") <= -1
+        && socket.url.indexOf("api-test.milkywayidle.com/ws") <= -1) {
+        return oriGet.call(this);
+      }
+
+      const message = oriGet.call(this);
+      Object.defineProperty(this, "data", { value: message }); // Anti-loop
+
+      return handleMessage(message);
+    }
+  }
+
+  function handleMessage(message) {
+    let obj = JSON.parse(message);
+    if (obj?.type === "init_character_data") {
+      character_data = obj;
+    }
+    // Useful for creating mapping in simulator
+    // if (obj?.type === "init_client_data") {
+    //   client_data = obj;
+    // }
+    return message;
+  }
+
+  function waitForElement(selector, callback, intervalTime = 500, timeout = 10000) {
+      const startTime = Date.now();
+
+      const interval = setInterval(() => {
+          const element = document.querySelector(selector);
+          if (element) {
+              clearInterval(interval);
+              callback(element);
+          } else if (Date.now() - startTime > timeout) {
+              clearInterval(interval);
+              console.warn(`Element ${selector} not found within ${timeout}ms`);
+          }
+      }, intervalTime);
+  }
+
+  function createCopyButton(parent) {
+    const childClass = "NavigationBar_minorNavigationLink__31K7Y";
+    const copyButton = document.createElement("div")
+    copyButton.classList.add(childClass)
+    copyButton.innerHTML = "Copy Inventory to Clipboard"
+    parent.appendChild(copyButton)
+    return copyButton;
+  }
 })();
