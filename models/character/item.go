@@ -7,7 +7,7 @@ type Item struct {
 	ItemHrid         string `json:"itemHrid"`
 	EnchantmentHrid  string `json:"enchantmentHrid"`
 	Count            int    `json:"count"`
-	offlineCount     int    `json:"offlineCount"`
+	OfflineCount     int    `json:"offlineCount"`
 	Hash             string `json:"hash"`
 	CreatedAt        string `json:"createdAt"`
 	UpdatedAt        string `json:"updatedAt"`
