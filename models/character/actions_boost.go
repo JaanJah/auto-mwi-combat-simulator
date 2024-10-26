@@ -1,4 +1,4 @@
-package models
+package models_character
 
 type ActionBoost struct {
 	UniqueHrid           string `json:"uniqueHrid"`

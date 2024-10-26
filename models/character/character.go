@@ -1,4 +1,4 @@
-package models
+package models_character
 
 type Character struct {
 	Skills         []Skill   `json:"skills"`

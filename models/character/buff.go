@@ -1,4 +1,4 @@
-package models
+package models_character
 
 type Buff struct {
 	Brewing        []ActionBoost `json:"/action_types/brewing"`

@@ -1,4 +1,4 @@
-package models
+package models_character
 
 type Ability struct {
 	CharacterId int     `json:"characterId"`

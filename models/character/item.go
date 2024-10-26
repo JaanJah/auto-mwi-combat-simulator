@@ -1,4 +1,4 @@
-package models
+package models_character
 
 type Item struct {
 	Id               int    `json:"id"`

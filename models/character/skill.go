@@ -1,4 +1,4 @@
-package models
+package models_character
 
 type Skill struct {
 	CharacterId       int     `json:"characterId"`
