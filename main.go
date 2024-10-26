@@ -1,24 +1,27 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
+
+	models "github.com/JaanJah/auto-mwi-combat-simulator/models/character"
 )
 
 func main() {
-	inventories := readInventories("input")
-	fmt.Println(len(inventories))
+	characters := readCharacters("input")
+	fmt.Printf("Amount of characters to simulate: %d", len(characters))
 }
 
-func readInventories(directory string) []string {
+func readCharacters(directory string) []models.Character {
 	files, err := os.ReadDir(directory)
 	if err != nil {
 		log.Fatalf("Failed to read directory: %v", err)
 	}
 
-	var inventories []string
+	var characters []models.Character
 
 	for _, file := range files {
 		if filepath.Ext(file.Name()) == ".json" {
@@ -28,9 +31,16 @@ func readInventories(directory string) []string {
 				log.Printf("Failed to read file %s: %v", filePath, err)
 				continue
 			}
-			inventories = append(inventories, string(data))
+			var character models.Character
+
+			unmarshal_err := json.Unmarshal([]byte(data), &character)
+			if unmarshal_err != nil {
+				log.Printf("Failed to parse file %s: %v", filePath, unmarshal_err)
+			}
+
+			characters = append(characters, character)
 		}
 	}
 
-	return inventories
+	return characters
 }
