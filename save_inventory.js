@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MWI - Save Inventory
 // @namespace    http://tampermonkey.net/
-// @version      0.0.2
+// @version      0.0.3
 // @description  Get MWI Inventory and save as JSON
 // @author       JaanJah
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=milkywayidle.com
@@ -86,12 +86,24 @@
   function copyToClipboard(copyButton) {
     navigator.clipboard.writeText(JSON.stringify({
       // client_data,
-      character_data
+      ...getCharacterData(character_data)
     }));
     const originalText = copyButton.innerHTML;
     copyButton.innerHTML = "Copied!";
     setTimeout(() => {
       copyButton.innerHTML = originalText;
     }, 500);
+  }
+
+  // To only get character data we are going to use
+  function getCharacterData(character_data) {
+    return {
+      skills: character_data.characterSkills,
+      abilities: character_data.characterAbilities,
+      items: character_data.characterItems,
+      houses: character_data.characterHouseRoomMap,
+      house_buffs: character_data.houseActionTypeBuffsMap,
+      equipment_buffs: character_data.equipmentActionTypeBuffsMap,
+    }
   }
 })();
