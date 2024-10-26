@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MWI - Save Inventory
 // @namespace    http://tampermonkey.net/
-// @version      0.0.1
+// @version      0.0.2
 // @description  Get MWI Inventory and save as JSON
 // @author       JaanJah
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=milkywayidle.com
@@ -16,17 +16,7 @@
   hookWS();
   waitForElement(".NavigationBar_minorNavigationLinks__dbxh7", (element) => {
     let copyButton = createCopyButton(element);
-    copyButton.addEventListener("click", () => {
-      navigator.clipboard.writeText(JSON.stringify({
-        // client_data,
-        character_data
-      }));
-      const originalText = copyButton.innerHTML;
-      copyButton.innerHTML = "Copied!";
-      setTimeout(() => {
-        copyButton.innerHTML = originalText;
-      }, 500);
-    });
+    copyButton.addEventListener("click", () => copyToClipboard(copyButton));
   });
   let client_data = {};
   let character_data = {};
@@ -91,5 +81,17 @@
     copyButton.innerHTML = "Copy Inventory to Clipboard"
     parent.appendChild(copyButton)
     return copyButton;
+  }
+
+  function copyToClipboard(copyButton) {
+    navigator.clipboard.writeText(JSON.stringify({
+      // client_data,
+      character_data
+    }));
+    const originalText = copyButton.innerHTML;
+    copyButton.innerHTML = "Copied!";
+    setTimeout(() => {
+      copyButton.innerHTML = originalText;
+    }, 500);
   }
 })();
